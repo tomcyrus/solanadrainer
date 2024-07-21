@@ -6,3 +6,89 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model Product {
+  id            String     @id @default(cuid())
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  name          String?
+  color         String?
+  title         String?
+  numberInStock Int?
+  description   String?
+  price         Float?
+  cartItems     CartItem[]
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  firstName String?
+  lastName  String?
+  username  String     @unique
+  email     String?    @unique
+  password  String
+  roles     Json
+  preOrders PreOrder[]
+  cartItems CartItem[]
+}
+
+model PaystackPayment {
+  id          String                     @id @default(cuid())
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @updatedAt
+  reference   String?
+  amount      Float?
+  paymentDate DateTime?
+  status      EnumPaystackPaymentStatus?
+}
+
+model CryptoPayment {
+  id            String    @id @default(cuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  walletAddress String?
+  transactionId String?
+  amount        Float?
+  paymentDate   DateTime?
+}
+
+model PreOrder {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  location     String?
+  designFile   Json?
+  description  String?
+  preOrderDate DateTime?
+  user         User?     @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  quantity  Int?
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+}
+
+enum EnumPaystackPaymentStatus {
+  Option1
+}
