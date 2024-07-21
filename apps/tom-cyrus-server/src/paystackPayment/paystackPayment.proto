@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+                 package paystackPayment;
+service PaystackPaymentService {
+ rpc createPaystackPayment (PaystackPaymentCreateInput) returns (PaystackPayment) {}
+rpc paystackPayments (findManyParams) returns (stream PaystackPayment) {}
+rpc paystackPayment (PaystackPaymentWhereUniqueInput) returns (PaystackPayment) {}
+rpc updatePaystackPayment (PaystackPaymentUpdateInput) returns (PaystackPayment) {}
+rpc deletePaystackPayment (PaystackPaymentWhereUniqueInput) returns (PaystackPayment) {} 
+ }
+message PaystackPaymentCreateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string reference = 4;
+int32 amount = 5;
+string paymentDate = 6;
+repeated string status = 7;
+};
+message PaystackPayment {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string reference = 4;
+int32 amount = 5;
+string paymentDate = 6;
+repeated string status = 7;
+};
+message PaystackPaymentWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string reference = 4;
+int32 amount = 5;
+string paymentDate = 6;
+repeated string status = 7;
+};
+message PaystackPaymentUpdateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string reference = 4;
+int32 amount = 5;
+string paymentDate = 6;
+repeated string status = 7;
+};
+message findManyParams {
+
+};

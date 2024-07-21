@@ -16,38 +16,20 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { GrpcMethod } from "@nestjs/microservices";
 import { PaystackPaymentService } from "../paystackPayment.service";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { PaystackPaymentCreateInput } from "./PaystackPaymentCreateInput";
-import { PaystackPayment } from "./PaystackPayment";
-import { PaystackPaymentFindManyArgs } from "./PaystackPaymentFindManyArgs";
+import { PaystackPaymentWhereInput } from "./PaystackPaymentWhereInput";
 import { PaystackPaymentWhereUniqueInput } from "./PaystackPaymentWhereUniqueInput";
+import { PaystackPaymentFindManyArgs } from "./PaystackPaymentFindManyArgs";
 import { PaystackPaymentUpdateInput } from "./PaystackPaymentUpdateInput";
+import { PaystackPayment } from "./PaystackPayment";
 
-@swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
-export class PaystackPaymentControllerBase {
-  constructor(
-    protected readonly service: PaystackPaymentService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
-  @common.UseInterceptors(AclValidateRequestInterceptor)
+export class PaystackPaymentGrpcControllerBase {
+  constructor(protected readonly service: PaystackPaymentService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: PaystackPayment })
-  @nestAccessControl.UseRoles({
-    resource: "PaystackPayment",
-    action: "create",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: PaystackPaymentCreateInput,
-  })
+  @GrpcMethod("PaystackPaymentService", "createPaystackPayment")
   async createPaystackPayment(
     @common.Body() data: PaystackPaymentCreateInput
   ): Promise<PaystackPayment> {
@@ -65,18 +47,10 @@ export class PaystackPaymentControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [PaystackPayment] })
   @ApiNestedQuery(PaystackPaymentFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "PaystackPayment",
-    action: "read",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("PaystackPaymentService", "paystackPayments")
   async paystackPayments(
     @common.Req() request: Request
   ): Promise<PaystackPayment[]> {
@@ -95,18 +69,10 @@ export class PaystackPaymentControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: PaystackPayment })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "PaystackPayment",
-    action: "read",
-    possession: "own",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("PaystackPaymentService", "paystackPayment")
   async paystackPayment(
     @common.Param() params: PaystackPaymentWhereUniqueInput
   ): Promise<PaystackPayment | null> {
@@ -130,21 +96,10 @@ export class PaystackPaymentControllerBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: PaystackPayment })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "PaystackPayment",
-    action: "update",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: PaystackPaymentUpdateInput,
-  })
+  @GrpcMethod("PaystackPaymentService", "updatePaystackPayment")
   async updatePaystackPayment(
     @common.Param() params: PaystackPaymentWhereUniqueInput,
     @common.Body() data: PaystackPaymentUpdateInput
@@ -176,14 +131,7 @@ export class PaystackPaymentControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: PaystackPayment })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "PaystackPayment",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("PaystackPaymentService", "deletePaystackPayment")
   async deletePaystackPayment(
     @common.Param() params: PaystackPaymentWhereUniqueInput
   ): Promise<PaystackPayment | null> {

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+                 package cartItem;
+service CartItemService {
+ rpc createCartItem (CartItemCreateInput) returns (CartItem) {}
+rpc cartItems (findManyParams) returns (stream CartItem) {}
+rpc cartItem (CartItemWhereUniqueInput) returns (CartItem) {}
+rpc updateCartItem (CartItemUpdateInput) returns (CartItem) {}
+rpc deleteCartItem (CartItemWhereUniqueInput) returns (CartItem) {} 
+ }
+message CartItemCreateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+int32 quantity = 4;
+};
+message CartItem {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+int32 quantity = 4;
+};
+message CartItemWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+int32 quantity = 4;
+};
+message CartItemUpdateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+int32 quantity = 4;
+};
+message findManyParams {
+
+};

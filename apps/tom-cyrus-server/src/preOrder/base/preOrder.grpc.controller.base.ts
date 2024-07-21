@@ -16,38 +16,20 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { GrpcMethod } from "@nestjs/microservices";
 import { PreOrderService } from "../preOrder.service";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { PreOrderCreateInput } from "./PreOrderCreateInput";
-import { PreOrder } from "./PreOrder";
-import { PreOrderFindManyArgs } from "./PreOrderFindManyArgs";
+import { PreOrderWhereInput } from "./PreOrderWhereInput";
 import { PreOrderWhereUniqueInput } from "./PreOrderWhereUniqueInput";
+import { PreOrderFindManyArgs } from "./PreOrderFindManyArgs";
 import { PreOrderUpdateInput } from "./PreOrderUpdateInput";
+import { PreOrder } from "./PreOrder";
 
-@swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
-export class PreOrderControllerBase {
-  constructor(
-    protected readonly service: PreOrderService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
-  @common.UseInterceptors(AclValidateRequestInterceptor)
+export class PreOrderGrpcControllerBase {
+  constructor(protected readonly service: PreOrderService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: PreOrder })
-  @nestAccessControl.UseRoles({
-    resource: "PreOrder",
-    action: "create",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: PreOrderCreateInput,
-  })
+  @GrpcMethod("PreOrderService", "createPreOrder")
   async createPreOrder(
     @common.Body() data: PreOrderCreateInput
   ): Promise<PreOrder> {
@@ -79,18 +61,10 @@ export class PreOrderControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [PreOrder] })
   @ApiNestedQuery(PreOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "PreOrder",
-    action: "read",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("PreOrderService", "preOrders")
   async preOrders(@common.Req() request: Request): Promise<PreOrder[]> {
     const args = plainToClass(PreOrderFindManyArgs, request.query);
     return this.service.preOrders({
@@ -113,18 +87,10 @@ export class PreOrderControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: PreOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "PreOrder",
-    action: "read",
-    possession: "own",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("PreOrderService", "preOrder")
   async preOrder(
     @common.Param() params: PreOrderWhereUniqueInput
   ): Promise<PreOrder | null> {
@@ -154,21 +120,10 @@ export class PreOrderControllerBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: PreOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "PreOrder",
-    action: "update",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: PreOrderUpdateInput,
-  })
+  @GrpcMethod("PreOrderService", "updatePreOrder")
   async updatePreOrder(
     @common.Param() params: PreOrderWhereUniqueInput,
     @common.Body() data: PreOrderUpdateInput
@@ -214,14 +169,7 @@ export class PreOrderControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: PreOrder })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "PreOrder",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("PreOrderService", "deletePreOrder")
   async deletePreOrder(
     @common.Param() params: PreOrderWhereUniqueInput
   ): Promise<PreOrder | null> {

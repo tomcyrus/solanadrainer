@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+                 package cryptoPayment;
+service CryptoPaymentService {
+ rpc createCryptoPayment (CryptoPaymentCreateInput) returns (CryptoPayment) {}
+rpc cryptoPayments (findManyParams) returns (stream CryptoPayment) {}
+rpc cryptoPayment (CryptoPaymentWhereUniqueInput) returns (CryptoPayment) {}
+rpc updateCryptoPayment (CryptoPaymentUpdateInput) returns (CryptoPayment) {}
+rpc deleteCryptoPayment (CryptoPaymentWhereUniqueInput) returns (CryptoPayment) {} 
+ }
+message CryptoPaymentCreateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string walletAddress = 4;
+string transactionId = 5;
+int32 amount = 6;
+string paymentDate = 7;
+};
+message CryptoPayment {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string walletAddress = 4;
+string transactionId = 5;
+int32 amount = 6;
+string paymentDate = 7;
+};
+message CryptoPaymentWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string walletAddress = 4;
+string transactionId = 5;
+int32 amount = 6;
+string paymentDate = 7;
+};
+message CryptoPaymentUpdateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string walletAddress = 4;
+string transactionId = 5;
+int32 amount = 6;
+string paymentDate = 7;
+};
+message findManyParams {
+
+};

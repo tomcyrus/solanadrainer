@@ -16,38 +16,20 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { GrpcMethod } from "@nestjs/microservices";
 import { CartItemService } from "../cartItem.service";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { CartItemCreateInput } from "./CartItemCreateInput";
-import { CartItem } from "./CartItem";
-import { CartItemFindManyArgs } from "./CartItemFindManyArgs";
+import { CartItemWhereInput } from "./CartItemWhereInput";
 import { CartItemWhereUniqueInput } from "./CartItemWhereUniqueInput";
+import { CartItemFindManyArgs } from "./CartItemFindManyArgs";
 import { CartItemUpdateInput } from "./CartItemUpdateInput";
+import { CartItem } from "./CartItem";
 
-@swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
-export class CartItemControllerBase {
-  constructor(
-    protected readonly service: CartItemService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
-  @common.UseInterceptors(AclValidateRequestInterceptor)
+export class CartItemGrpcControllerBase {
+  constructor(protected readonly service: CartItemService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: CartItem })
-  @nestAccessControl.UseRoles({
-    resource: "CartItem",
-    action: "create",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: CartItemCreateInput,
-  })
+  @GrpcMethod("CartItemService", "createCartItem")
   async createCartItem(
     @common.Body() data: CartItemCreateInput
   ): Promise<CartItem> {
@@ -88,18 +70,10 @@ export class CartItemControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [CartItem] })
   @ApiNestedQuery(CartItemFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "CartItem",
-    action: "read",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("CartItemService", "cartItems")
   async cartItems(@common.Req() request: Request): Promise<CartItem[]> {
     const args = plainToClass(CartItemFindManyArgs, request.query);
     return this.service.cartItems({
@@ -125,18 +99,10 @@ export class CartItemControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: CartItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "CartItem",
-    action: "read",
-    possession: "own",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("CartItemService", "cartItem")
   async cartItem(
     @common.Param() params: CartItemWhereUniqueInput
   ): Promise<CartItem | null> {
@@ -169,21 +135,10 @@ export class CartItemControllerBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: CartItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "CartItem",
-    action: "update",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: CartItemUpdateInput,
-  })
+  @GrpcMethod("CartItemService", "updateCartItem")
   async updateCartItem(
     @common.Param() params: CartItemWhereUniqueInput,
     @common.Body() data: CartItemUpdateInput
@@ -238,14 +193,7 @@ export class CartItemControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: CartItem })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "CartItem",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("CartItemService", "deleteCartItem")
   async deleteCartItem(
     @common.Param() params: CartItemWhereUniqueInput
   ): Promise<CartItem | null> {
