@@ -16,38 +16,20 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { GrpcMethod } from "@nestjs/microservices";
 import { CryptoPaymentService } from "../cryptoPayment.service";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { CryptoPaymentCreateInput } from "./CryptoPaymentCreateInput";
-import { CryptoPayment } from "./CryptoPayment";
-import { CryptoPaymentFindManyArgs } from "./CryptoPaymentFindManyArgs";
+import { CryptoPaymentWhereInput } from "./CryptoPaymentWhereInput";
 import { CryptoPaymentWhereUniqueInput } from "./CryptoPaymentWhereUniqueInput";
+import { CryptoPaymentFindManyArgs } from "./CryptoPaymentFindManyArgs";
 import { CryptoPaymentUpdateInput } from "./CryptoPaymentUpdateInput";
+import { CryptoPayment } from "./CryptoPayment";
 
-@swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
-export class CryptoPaymentControllerBase {
-  constructor(
-    protected readonly service: CryptoPaymentService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
-  @common.UseInterceptors(AclValidateRequestInterceptor)
+export class CryptoPaymentGrpcControllerBase {
+  constructor(protected readonly service: CryptoPaymentService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: CryptoPayment })
-  @nestAccessControl.UseRoles({
-    resource: "CryptoPayment",
-    action: "create",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: CryptoPaymentCreateInput,
-  })
+  @GrpcMethod("CryptoPaymentService", "createCryptoPayment")
   async createCryptoPayment(
     @common.Body() data: CryptoPaymentCreateInput
   ): Promise<CryptoPayment> {
@@ -65,18 +47,10 @@ export class CryptoPaymentControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [CryptoPayment] })
   @ApiNestedQuery(CryptoPaymentFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "CryptoPayment",
-    action: "read",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("CryptoPaymentService", "cryptoPayments")
   async cryptoPayments(
     @common.Req() request: Request
   ): Promise<CryptoPayment[]> {
@@ -95,18 +69,10 @@ export class CryptoPaymentControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: CryptoPayment })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "CryptoPayment",
-    action: "read",
-    possession: "own",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("CryptoPaymentService", "cryptoPayment")
   async cryptoPayment(
     @common.Param() params: CryptoPaymentWhereUniqueInput
   ): Promise<CryptoPayment | null> {
@@ -130,21 +96,10 @@ export class CryptoPaymentControllerBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: CryptoPayment })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "CryptoPayment",
-    action: "update",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: CryptoPaymentUpdateInput,
-  })
+  @GrpcMethod("CryptoPaymentService", "updateCryptoPayment")
   async updateCryptoPayment(
     @common.Param() params: CryptoPaymentWhereUniqueInput,
     @common.Body() data: CryptoPaymentUpdateInput
@@ -176,14 +131,7 @@ export class CryptoPaymentControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: CryptoPayment })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "CryptoPayment",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("CryptoPaymentService", "deleteCryptoPayment")
   async deleteCryptoPayment(
     @common.Param() params: CryptoPaymentWhereUniqueInput
   ): Promise<CryptoPayment | null> {

@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+                 package product;
+service ProductService {
+ rpc createProduct (ProductCreateInput) returns (Product) {}
+rpc products (findManyParams) returns (stream Product) {}
+rpc product (ProductWhereUniqueInput) returns (Product) {}
+rpc updateProduct (ProductUpdateInput) returns (Product) {}
+rpc deleteProduct (ProductWhereUniqueInput) returns (Product) {}
+rpc findManyProduct (ProductWhereUniqueInput) returns (stream CartItem) {}
+rpc updateProduct (CartItemParams) returns (stream CartItem) {}
+rpc connectProduct (CartItemParams) returns (CartItem) {}
+rpc disconnectProduct (CartItemParams) returns (CartItem) {} 
+ }
+message ProductCreateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string name = 4;
+string color = 5;
+string title = 6;
+int32 numberInStock = 7;
+string description = 8;
+int32 price = 9;
+repeated CartItem cartItems = 10;
+};
+message Product {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string name = 4;
+string color = 5;
+string title = 6;
+int32 numberInStock = 7;
+string description = 8;
+int32 price = 9;
+repeated CartItem cartItems = 10;
+};
+message ProductWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string name = 4;
+string color = 5;
+string title = 6;
+int32 numberInStock = 7;
+string description = 8;
+int32 price = 9;
+repeated CartItem cartItems = 10;
+};
+message ProductUpdateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string name = 4;
+string color = 5;
+string title = 6;
+int32 numberInStock = 7;
+string description = 8;
+int32 price = 9;
+repeated CartItem cartItems = 10;
+};
+message findManyParams {
+
+};
+message CartItem {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+int32 quantity = 4;
+};
+message CartItemWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+int32 quantity = 4;
+};
+message CartItemParams {
+ProductWhereUniqueInput productWhereUniqueInput = 1;
+CartItemWhereUniqueInput cartitemWhereUniqueInput = 2;
+};

@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+                 package user;
+service UserService {
+ rpc createUser (UserCreateInput) returns (User) {}
+rpc users (findManyParams) returns (stream User) {}
+rpc user (UserWhereUniqueInput) returns (User) {}
+rpc updateUser (UserUpdateInput) returns (User) {}
+rpc deleteUser (UserWhereUniqueInput) returns (User) {}
+rpc findManyUser (UserWhereUniqueInput) returns (stream PreOrder) {}
+rpc updateUser (PreOrderParams) returns (stream PreOrder) {}
+rpc connectUser (PreOrderParams) returns (PreOrder) {}
+rpc disconnectUser (PreOrderParams) returns (PreOrder) {}
+rpc findManyUser (UserWhereUniqueInput) returns (stream CartItem) {}
+rpc updateUser (CartItemParams) returns (stream CartItem) {}
+rpc connectUser (CartItemParams) returns (CartItem) {}
+rpc disconnectUser (CartItemParams) returns (CartItem) {} 
+ }
+message UserCreateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string firstName = 4;
+string lastName = 5;
+string username = 6;
+string email = 7;
+string password = 8;
+repeated string roles = 9;
+repeated PreOrder preOrders = 10;
+repeated CartItem cartItems = 11;
+};
+message User {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string firstName = 4;
+string lastName = 5;
+string username = 6;
+string email = 7;
+string password = 8;
+repeated string roles = 9;
+repeated PreOrder preOrders = 10;
+repeated CartItem cartItems = 11;
+};
+message UserWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string firstName = 4;
+string lastName = 5;
+string username = 6;
+string email = 7;
+string password = 8;
+repeated string roles = 9;
+repeated PreOrder preOrders = 10;
+repeated CartItem cartItems = 11;
+};
+message UserUpdateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string firstName = 4;
+string lastName = 5;
+string username = 6;
+string email = 7;
+string password = 8;
+repeated string roles = 9;
+repeated PreOrder preOrders = 10;
+repeated CartItem cartItems = 11;
+};
+message findManyParams {
+
+};
+message PreOrder {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string location = 4;
+string designFile = 5;
+string description = 6;
+string preOrderDate = 7;
+};
+message PreOrderWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string location = 4;
+string designFile = 5;
+string description = 6;
+string preOrderDate = 7;
+};
+message PreOrderParams {
+UserWhereUniqueInput userWhereUniqueInput = 1;
+PreOrderWhereUniqueInput preorderWhereUniqueInput = 2;
+};
+message CartItem {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+int32 quantity = 4;
+};
+message CartItemWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+int32 quantity = 4;
+};
+message CartItemParams {
+UserWhereUniqueInput userWhereUniqueInput = 1;
+CartItemWhereUniqueInput cartitemWhereUniqueInput = 2;
+};

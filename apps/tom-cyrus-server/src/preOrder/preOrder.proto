@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+                 package preOrder;
+service PreOrderService {
+ rpc createPreOrder (PreOrderCreateInput) returns (PreOrder) {}
+rpc preOrders (findManyParams) returns (stream PreOrder) {}
+rpc preOrder (PreOrderWhereUniqueInput) returns (PreOrder) {}
+rpc updatePreOrder (PreOrderUpdateInput) returns (PreOrder) {}
+rpc deletePreOrder (PreOrderWhereUniqueInput) returns (PreOrder) {} 
+ }
+message PreOrderCreateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string location = 4;
+string designFile = 5;
+string description = 6;
+string preOrderDate = 7;
+};
+message PreOrder {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string location = 4;
+string designFile = 5;
+string description = 6;
+string preOrderDate = 7;
+};
+message PreOrderWhereUniqueInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string location = 4;
+string designFile = 5;
+string description = 6;
+string preOrderDate = 7;
+};
+message PreOrderUpdateInput {
+string id = 1;
+string createdAt = 2;
+string updatedAt = 3;
+string location = 4;
+string designFile = 5;
+string description = 6;
+string preOrderDate = 7;
+};
+message findManyParams {
+
+};

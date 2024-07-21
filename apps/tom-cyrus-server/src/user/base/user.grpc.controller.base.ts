@@ -16,16 +16,14 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
+import { GrpcMethod } from "@nestjs/microservices";
 import { UserService } from "../user.service";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { UserCreateInput } from "./UserCreateInput";
-import { User } from "./User";
-import { UserFindManyArgs } from "./UserFindManyArgs";
+import { UserWhereInput } from "./UserWhereInput";
 import { UserWhereUniqueInput } from "./UserWhereUniqueInput";
+import { UserFindManyArgs } from "./UserFindManyArgs";
 import { UserUpdateInput } from "./UserUpdateInput";
+import { User } from "./User";
 import { PreOrderFindManyArgs } from "../../preOrder/base/PreOrderFindManyArgs";
 import { PreOrder } from "../../preOrder/base/PreOrder";
 import { PreOrderWhereUniqueInput } from "../../preOrder/base/PreOrderWhereUniqueInput";
@@ -33,27 +31,11 @@ import { CartItemFindManyArgs } from "../../cartItem/base/CartItemFindManyArgs";
 import { CartItem } from "../../cartItem/base/CartItem";
 import { CartItemWhereUniqueInput } from "../../cartItem/base/CartItemWhereUniqueInput";
 
-@swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
-export class UserControllerBase {
-  constructor(
-    protected readonly service: UserService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
-  @common.UseInterceptors(AclValidateRequestInterceptor)
+export class UserGrpcControllerBase {
+  constructor(protected readonly service: UserService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: User })
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "create",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: UserCreateInput,
-  })
+  @GrpcMethod("UserService", "createUser")
   async createUser(@common.Body() data: UserCreateInput): Promise<User> {
     return await this.service.createUser({
       data: data,
@@ -70,18 +52,10 @@ export class UserControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [User] })
   @ApiNestedQuery(UserFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "read",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("UserService", "users")
   async users(@common.Req() request: Request): Promise<User[]> {
     const args = plainToClass(UserFindManyArgs, request.query);
     return this.service.users({
@@ -99,18 +73,10 @@ export class UserControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: User })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "read",
-    possession: "own",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("UserService", "user")
   async user(
     @common.Param() params: UserWhereUniqueInput
   ): Promise<User | null> {
@@ -135,21 +101,10 @@ export class UserControllerBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: User })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "update",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
-  @swagger.ApiBody({
-    type: UserUpdateInput,
-  })
+  @GrpcMethod("UserService", "updateUser")
   async updateUser(
     @common.Param() params: UserWhereUniqueInput,
     @common.Body() data: UserUpdateInput
@@ -182,14 +137,7 @@ export class UserControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: User })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
+  @GrpcMethod("UserService", "deleteUser")
   async deleteUser(
     @common.Param() params: UserWhereUniqueInput
   ): Promise<User | null> {
@@ -217,15 +165,10 @@ export class UserControllerBase {
     }
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/preOrders")
   @ApiNestedQuery(PreOrderFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "PreOrder",
-    action: "read",
-    possession: "any",
-  })
-  async findPreOrders(
+  @GrpcMethod("UserService", "findManyPreOrders")
+  async findManyPreOrders(
     @common.Req() request: Request,
     @common.Param() params: UserWhereUniqueInput
   ): Promise<PreOrder[]> {
@@ -257,11 +200,7 @@ export class UserControllerBase {
   }
 
   @common.Post("/:id/preOrders")
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "update",
-    possession: "any",
-  })
+  @GrpcMethod("UserService", "connectPreOrders")
   async connectPreOrders(
     @common.Param() params: UserWhereUniqueInput,
     @common.Body() body: PreOrderWhereUniqueInput[]
@@ -279,11 +218,7 @@ export class UserControllerBase {
   }
 
   @common.Patch("/:id/preOrders")
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "update",
-    possession: "any",
-  })
+  @GrpcMethod("UserService", "updatePreOrders")
   async updatePreOrders(
     @common.Param() params: UserWhereUniqueInput,
     @common.Body() body: PreOrderWhereUniqueInput[]
@@ -301,11 +236,7 @@ export class UserControllerBase {
   }
 
   @common.Delete("/:id/preOrders")
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "update",
-    possession: "any",
-  })
+  @GrpcMethod("UserService", "disconnectPreOrders")
   async disconnectPreOrders(
     @common.Param() params: UserWhereUniqueInput,
     @common.Body() body: PreOrderWhereUniqueInput[]
@@ -322,15 +253,10 @@ export class UserControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/cartItems")
   @ApiNestedQuery(CartItemFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "CartItem",
-    action: "read",
-    possession: "any",
-  })
-  async findCartItems(
+  @GrpcMethod("UserService", "findManyCartItems")
+  async findManyCartItems(
     @common.Req() request: Request,
     @common.Param() params: UserWhereUniqueInput
   ): Promise<CartItem[]> {
@@ -365,11 +291,7 @@ export class UserControllerBase {
   }
 
   @common.Post("/:id/cartItems")
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "update",
-    possession: "any",
-  })
+  @GrpcMethod("UserService", "connectCartItems")
   async connectCartItems(
     @common.Param() params: UserWhereUniqueInput,
     @common.Body() body: CartItemWhereUniqueInput[]
@@ -387,11 +309,7 @@ export class UserControllerBase {
   }
 
   @common.Patch("/:id/cartItems")
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "update",
-    possession: "any",
-  })
+  @GrpcMethod("UserService", "updateCartItems")
   async updateCartItems(
     @common.Param() params: UserWhereUniqueInput,
     @common.Body() body: CartItemWhereUniqueInput[]
@@ -409,11 +327,7 @@ export class UserControllerBase {
   }
 
   @common.Delete("/:id/cartItems")
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "update",
-    possession: "any",
-  })
+  @GrpcMethod("UserService", "disconnectCartItems")
   async disconnectCartItems(
     @common.Param() params: UserWhereUniqueInput,
     @common.Body() body: CartItemWhereUniqueInput[]
